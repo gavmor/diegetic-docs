@@ -1,0 +1,27 @@
+# Run the skill's executable gate plus an end-to-end example render on every push.
+# Mirrors the push-to-main CI pattern from gavmor/resume (WeasyPrint toolchain).
+name: check
+on: [push]
+jobs:
+  example:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install PDF toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y \
+            libpango-1.0-0 \
+            libpangoft2-1.0-0
+          python -m pip install --upgrade pip
+          python -m pip install weasyprint fonttools pillow
+      - name: Gate + example render
+        run: |
+          cd examples/minimal-order
+          ../../bin/make_plate.py --out assets/paper-plate.png
+          ../../bin/fetch_fonts.py --out assets/fonts
+          ../../bin/check.py --html order.html
+          python3 -m weasyprint order.html order.pdf

@@ -26,6 +26,11 @@ chart.
    routing block with dotted leaders, spec tables, note boxes, stamp,
    margin-box footers). Transcribe the source faithfully; form furniture
    (copy numbers, page numbers, stamps) is fine to add, content is not.
+   For live-stamped orders, pull war telemetry first:
+   `bin/war_telemetry.py --shard live-1` prints the WAR / WAR ID / DATE /
+   WAR START routing lines — see `references/war-telemetry.md`. Dates stay
+   diegetic ("Day 27 of the 141st War"); the war number, war ID, and
+   in-game day are already in-world.
 4. **Charts** — draw Gantt / step charts directly in PIL per
    `references/charts.md`. Every bar endpoint comes from a stated figure;
    an unstated duration becomes a milestone diamond, never a guessed bar.
@@ -43,6 +48,9 @@ A runnable minimal example is in `examples/minimal-order/`.
 - `bin/fetch_fonts.py` — fetch + verify Courier Prime / Special Elite.
 - `bin/check.py` — executable gate: font validity, `@page` background
   layering, asset references.
+- `bin/war_telemetry.py` — live Foxhole war telemetry for stamped orders
+  (war number/ID, in-game day, diegetic war start); see
+  `references/war-telemetry.md`.
 - `assets/fonts/` — OFL fonts (Courier Prime, Special Elite); populate per
   project with `fetch_fonts.py` — or copy the vendored set from
   `examples/minimal-order/assets/fonts/` for offline use.
