@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+# generated per build — recreate with bin/make_plate.py / weasyprint
+examples/*/assets/paper-plate*.png
+examples/*/*.pdf
+examples/*/ex-*.png
