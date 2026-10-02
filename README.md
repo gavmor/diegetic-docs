@@ -26,8 +26,9 @@ python3 -m weasyprint order.html order.pdf
   `war_telemetry.py` (live Foxhole war telemetry for stamped orders).
 - `assets/fonts/` — vendored OFL fonts (Courier Prime, Special Elite).
 - `references/` — `print-css.md` (WeasyPrint form patterns + the hard-won
-  `@page` background rules), `charts.md` (PIL chart toolkit + recipes),
-  `war-telemetry.md` (WarAPI endpoints, field mapping, rate limits).
+  `@page` background rules), `charts.md` (JSON-driven Gantt / step-chart
+  renderers + schemas), `war-telemetry.md` (WarAPI endpoints, field mapping,
+  rate limits).
 - `assets/fonts/` — vendored OFL fonts (Courier Prime, Special Elite).
 - `references/` — `print-css.md` (WeasyPrint form patterns + the hard-won
   `@page` background rules), `charts.md` (PIL chart toolkit + recipes).

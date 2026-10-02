@@ -25,3 +25,10 @@ jobs:
           ../../bin/fetch_fonts.py --out assets/fonts
           ../../bin/check.py --html order.html
           python3 -m weasyprint order.html order.pdf
+      - name: Chart examples
+        run: |
+          cd examples/charts
+          ../../bin/gantt.py --spec production-timetable.json \
+            --out /tmp/production-timetable.png
+          ../../bin/stepchart.py --spec power-plan.json \
+            --out /tmp/power-plan.png

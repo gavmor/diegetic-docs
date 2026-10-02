@@ -31,8 +31,10 @@ chart.
    WAR START routing lines — see `references/war-telemetry.md`. Dates stay
    diegetic ("Day 27 of the 141st War"); the war number, war ID, and
    in-game day are already in-world.
-4. **Charts** — draw Gantt / step charts directly in PIL per
-   `references/charts.md`. Every bar endpoint comes from a stated figure;
+4. **Charts** — `bin/gantt.py` / `bin/stepchart.py` render JSON-driven
+   planning charts (Gantt timetables, capacity step-charts) directly in
+   PIL; see `references/charts.md` and the runnable LQ-7 specs in
+   `examples/charts/`. Every bar endpoint comes from a stated figure;
    an unstated duration becomes a milestone diamond, never a guessed bar.
 5. **Render + QA** — `bin/check.py --html doc.html` (fonts real,
    single-layer `@page` background, all `url()`s resolve), then
@@ -51,6 +53,14 @@ A runnable minimal example is in `examples/minimal-order/`.
 - `bin/war_telemetry.py` — live Foxhole war telemetry for stamped orders
   (war number/ID, in-game day, diegetic war start); see
   `references/war-telemetry.md`.
+- `bin/chartkit.py` — shared chart primitives (plates, fonts, dashed
+  lines, hatch rects, milestone diamonds, seal/stamp header, footer).
+- `bin/gantt.py --spec spec.json --out chart.png` — JSON-driven Gantt
+  timetable renderer.
+- `bin/stepchart.py --spec spec.json --out chart.png` — JSON-driven
+  capacity step-chart renderer.
+- `examples/charts/` — runnable LQ-7 specs (`production-timetable.json`,
+  `power-plan.json`) proving both renderers.
 - `assets/fonts/` — OFL fonts (Courier Prime, Special Elite); populate per
   project with `fetch_fonts.py` — or copy the vendored set from
   `examples/minimal-order/assets/fonts/` for offline use.

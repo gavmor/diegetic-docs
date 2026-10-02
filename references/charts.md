@@ -1,62 +1,76 @@
-# Chart toolkit — PIL-drawn planning charts
+# Chart toolkit — JSON-driven planning charts
 
-Charts are drawn directly with PIL, not matplotlib: full control over the
-period look (paper plate, typewriter labels, ink bars, rubber-stamp
+Charts are rendered directly with PIL by `bin/gantt.py` and
+`bin/stepchart.py`, driven by JSON specs. No matplotlib: full control over
+the period look (paper plate, typewriter labels, ink bars, rubber-stamp
 accents), and no fighting a plotting library's default aesthetic.
 
-## Setup
-
-- Canvas: landscape 11×8.5in at 300dpi = 3300×2550. Bake the plate with
-  `bin/make_plate.py --format landscape --dpi 300`.
-- Fonts: `ImageFont.truetype` on the vendored Courier Prime / Special Elite
-  TTFs. Typical sizes at 300dpi: titles 64–66px, axis labels 30px, bar labels
-  28–30px, footnotes 26–28px.
-- Palette: ink `(38,34,28)`, faint `(122,108,84)`, rule `(90,80,62)`,
-  stamp-red `(140,28,28)`.
-
-## Helpers (copy into the chart script)
-
-```python
-def dashed_line(d, x0, y0, x1, y1, fill, width=3, dash=18, gap=12):
-    # manual dashes — PIL has no setdash
-def hatch_rect(base, x0, y0, x1, y1, fill, hatch, border):
-    # fill + diagonal hatch clipped to the rect via an L mask, then border
-def diamond(d, cx, cy, r, fill):
-    d.polygon([cx, cy-r, cx+r, cy, cx, cy+r, cx-r, cy], fill=fill)
+```bash
+./bin/gantt.py --spec examples/charts/production-timetable.json \
+    --out timetable.png
+./bin/stepchart.py --spec examples/charts/power-plan.json \
+    --out power.png
 ```
 
-`hatch_rect` draws the hatch on a separate RGBA layer and pastes it through
-a rectangular mask — the diagonal lines never escape the bar.
+Shared primitives live in `bin/chartkit.py`: plate baking, font loading,
+dashed lines, hatch rects (clipped via mask), milestone diamonds, the
+seal/stamp header block, margin footer, and the time-axis helpers. Both
+renderers import it; do not duplicate the helpers.
 
-## Gantt recipe (proven on a 9-row, T+0–T+120 production timetable)
+## Gantt spec (`gantt.py`)
 
-1. **Header block**: seal PNG pasted top-left, centered title lines
-   (Special Elite title, bold subtitle, faint sub-line), double rule under,
-   RESTRICTED stamp rotated −9° top-right (build the stamp on its own RGBA
-   layer, `rotate(-9, expand=True)`, then paste with its alpha).
-2. **Grid**: vertical lines every 10 min (light), heavier every 30;
-   tick labels `T+0 … T+120` below. Row labels right-aligned in a fixed
-   left column (name bold, sub-line faint).
-3. **Bars**: solid ink rects with the label in paper-light type *inside*
-   the bar when it fits (`> ~340px`), otherwise in ink *right of* the bar.
-   Thin sub-bars sit below the main bar with an italic faint caption.
-4. **Milestones**: red diamonds with red labels above (or below when the
-   row above is crowded). A red dashed vertical for the terminal event
-   (e.g. MUSTER), labeled above the grid.
-5. **Legend**: lay out dynamically — measure each label with
-   `font.getbbox` and advance; fixed offsets collide once labels grow.
+```json
+{
+  "title": "PRODUCTION TIMETABLE", "subtitle": "...", "sub2": "...",
+  "footer": "...", "seal": "path-or-null", "stamp": "RESTRICTED",
+  "tmax": 120, "tick": 10, "major": 30, "xlabel": "MINUTES",
+  "rows": [
+    {"name": "REFINERY", "sub": "Tine",
+     "bars": [
+       {"a": 0, "b": 53, "label": "REFINED MATERIALS ×80 — 53 MIN"},
+       {"a": 0, "b": 5, "label": "580 B.M. FIRST", "thin": true},
+       {"a": 5, "b": 112, "label": "LIT · ~107 MIN", "hatch": true}
+     ],
+     "milestones": [{"t": 53, "label": "REFINED DONE", "above": true}]}
+  ],
+  "vlines": [{"t": 111, "label": "MUSTER"}]
+}
+```
 
-## Step-chart recipe (proven on a MW-draw-against-capacity power plan)
+Bar kinds: solid ink (default), `"thin"` (small bar under the row's main
+bar, italic caption), `"hatch"` (hatched — plant-lit). Labels sit inside
+wide bars, right of narrow ones. Milestones are red diamonds labeled above
+(`"above": false` for below). `vlines` are red dashed terminal lines. The
+legend lays itself out dynamically from measured label widths, and the
+"plant lit" entry appears only when a hatch bar exists.
 
-1. Axes: MW 0–14 horizontal gridlines, dashed capacity lines (one plant /
-   two plants) labeled at right.
-2. The draw line: walk the step list, drawing horizontal segments and
-   vertical risers at 6–7px ink; fill under with ink at low alpha via a
-   polygon closed along the bottom.
-3. Annotate each step's cause ("+ COAL REFINERY — 3 MW") above the line;
-   red italic for warnings ("5 MW ON A 5 MW PLANT — NO MARGIN").
-4. Diegetic prohibition notes ("NEVER RUN ALL FOUR WORKS AT ONCE…") in red
-   bold below the axis, clear of the axis title.
+## Step-chart spec (`stepchart.py`)
+
+```json
+{
+  "title": "POWER PLAN", "subtitle": "...", "sub2": "...", "footer": "...",
+  "seal": null, "stamp": "RESTRICTED",
+  "tmax": 120, "tick": 10, "xlabel": "MINUTES",
+  "ymax": 14, "ytick": 2, "ylabel": "MW",
+  "capacity": [{"mw": 5, "label": "ONE PLANT — 5 MW"}],
+  "steps": [
+    {"t0": 0, "t1": 5, "mw": 0},
+    {"t0": 5, "t1": 26, "mw": 2, "label": "MATERIALS\nFACTORY"}
+  ],
+  "annotations": [
+    {"t": 52, "mw": 5, "dy": 44, "text": "5 MW ON A 5 MW PLANT — NO MARGIN",
+     "color": "red", "italic": true}
+  ],
+  "callouts": [{"text": "NOTE — NEVER RUN ALL FOUR WORKS AT ONCE ..."}],
+  "vlines": [{"t": 111, "label": "MUSTER"}]
+}
+```
+
+Steps draw as a filled step line with 7px ink risers. A step `"label"`
+(`\n` for line breaks) sits above the segment midpoint, or at `"t"` when
+given. Annotations pin styled text above/below (`"dy"`) a `(t, mw)` point.
+Callouts stack as red bold lines under the axis. Capacity lines are dashed
+with right-hand labels.
 
 ## Data-grounding rule
 
