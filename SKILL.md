@@ -1,0 +1,69 @@
+---
+name: "diegetic-docs"
+description: "Generate diegetic in-world documents — military orders, requisition forms, staff paperwork — and planning charts (Gantt timetables, capacity step-charts) on aged paper with typewriter typography. Use when the user wants an immersive prop document for LARPing or a tabletop game, or asks for a document that looks typed, stamped, and filed."
+metadata: { "includeInPrompt": true }
+---
+
+# diegetic-docs
+
+Turn source text into documents that look like they were typed at a depot
+desk: baked aged-paper plates, real typewriter fonts, rubber stamps, ruled
+spec tables, and PIL-drawn planning charts. Proven on an 11-page Warden
+requisition order (Form LQ-7, rev. 2) plus a production Gantt and power-plan
+chart.
+
+## Workflow
+
+1. **Plate** — `bin/make_plate.py --format portrait|landscape --dpi 200`
+   bakes one PNG carrying the whole page background (tone, grain, stains,
+   vignette, crease). WeasyPrint drops every `@page` background layer but
+   one, so there is no other route.
+2. **Fonts** — `bin/fetch_fonts.py --out assets/fonts` downloads Courier
+   Prime (body) + Special Elite (display) and **verifies** each file is real
+   font data. A 404 HTML page saved as `.ttf` renders as a silent fallback;
+   the script deletes those and fails.
+3. **Document** — write the HTML per `references/print-css.md` (masthead,
+   routing block with dotted leaders, spec tables, note boxes, stamp,
+   margin-box footers). Transcribe the source faithfully; form furniture
+   (copy numbers, page numbers, stamps) is fine to add, content is not.
+4. **Charts** — draw Gantt / step charts directly in PIL per
+   `references/charts.md`. Every bar endpoint comes from a stated figure;
+   an unstated duration becomes a milestone diamond, never a guessed bar.
+5. **Render + QA** — `bin/check.py --html doc.html` (fonts real,
+   single-layer `@page` background, all `url()`s resolve), then
+   `python3 -m weasyprint doc.html doc.pdf`. **Rasterize and look**
+   (`pdftoppm -png -r 60`); never trust `pdftotext` alone at style
+   boundaries. For Discord, export PNGs at 150–200dpi.
+
+A runnable minimal example is in `examples/minimal-order/`.
+
+## Tooling
+
+- `bin/make_plate.py` — aged-paper plate, portrait/landscape, seeded.
+- `bin/fetch_fonts.py` — fetch + verify Courier Prime / Special Elite.
+- `bin/check.py` — executable gate: font validity, `@page` background
+  layering, asset references.
+- `assets/fonts/` — OFL fonts (Courier Prime, Special Elite); populate per
+  project with `fetch_fonts.py` — or copy the vendored set from
+  `examples/minimal-order/assets/fonts/` for offline use.
+
+## Output Contract
+
+- Documents: US Letter PDF via WeasyPrint (portrait for orders, landscape
+  for charts), plus 150–200dpi PNGs when the user wants them for chat/Discord.
+- Charts: landscape PNGs at 300dpi; a 2-up landscape PDF when print is wanted.
+- All figures traceable to the source text; no invented content in bars,
+  tables, or routing blocks.
+
+## Operating Rules
+
+1. WeasyPrint for styled prose — never takumi-pdf (unfixable italic/state
+   corruption in real paragraphs).
+2. One `@page` background-image layer, positioned with negative offsets
+   equal to the margins (`background-position: -0.8in -0.72in`).
+3. Register every font weight/style with `@font-face`; verify the TTFs are
+   real before trusting a render.
+4. QA is rasterize-and-look, always. Two failed visual attempts → ask one
+   sharp disambiguating question instead of shipping a third guess.
+5. Keep the user's source text intact; flag tensions between their spec and
+   the layout in one line rather than silently "fixing" either.

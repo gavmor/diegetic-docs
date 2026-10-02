@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Minimal diegetic order — diegetic-docs example</title>
+<style>
+@font-face { font-family: "Courier Prime";
+  src: url("assets/fonts/courier-prime-regular.ttf"); }
+@font-face { font-family: "Courier Prime"; font-weight: 700;
+  src: url("assets/fonts/courier-prime-bold.ttf"); }
+@font-face { font-family: "Special Elite";
+  src: url("assets/fonts/special-elite.ttf"); }
+
+@page {
+  size: 8.5in 11in;
+  margin: 0.8in;
+  background-image: url("assets/paper-plate.png");
+  background-size: 8.5in 11in;
+  background-position: -0.8in -0.8in;
+  background-repeat: no-repeat;
+  @bottom-center { content: "— " counter(page) " —";
+    font-family: "Courier Prime", monospace; font-size: 8pt; color: #5a5245; }
+}
+body { font-family: "Courier Prime", monospace; font-size: 10.5pt;
+       line-height: 1.42; color: #26221a; margin: 0; }
+.masthead { position: relative; border-top: 5px double #26221a;
+  border-bottom: 5px double #26221a; padding: 12px; margin-bottom: 16px; }
+.masthead h1 { font-family: "Special Elite", monospace; font-weight: 400;
+  text-align: center; letter-spacing: 2pt; margin: 2px 0; font-size: 17pt; }
+.masthead .sub { text-align: center; letter-spacing: 3pt; font-size: 10pt; }
+.stamp { position: absolute; right: 6px; top: -30px; transform: rotate(-9deg);
+  border: 4px double #9c1f1f; color: #9c1f1f; font-weight: 700;
+  font-size: 18pt; letter-spacing: 6px; padding: 2px 12px; opacity: 0.78; }
+.rrow { display: flex; align-items: baseline; margin: 3px 0; }
+.rrow .lab { font-weight: 700; font-size: 9.5pt; white-space: nowrap; }
+.rrow .dots { flex: 1; border-bottom: 2px dotted #6b6252; margin: 0 6px; }
+h2.sec { font-size: 11.5pt; letter-spacing: 3px;
+  border-bottom: 2px solid #26221a; padding-bottom: 3px; }
+table.spec { width: 100%; border-collapse: collapse; font-size: 9.6pt;
+  page-break-inside: avoid; }
+table.spec th { text-align: left; border-bottom: 3px double #26221a;
+  padding: 4px 6px; }
+table.spec td { border-bottom: 1px solid #8a8069; padding: 4px 6px; }
+table.spec tr:last-child td { border-bottom: 2px solid #26221a; }
+</style>
+</head>
+<body>
+<div class="masthead">
+  <div class="stamp">DRAFT</div>
+  <h1>TINE LOGISTICS DEPOT</h1>
+  <div class="sub">REQUISITION &amp; PRODUCTION ORDER</div>
+</div>
+<div class="rrow"><span class="lab">ORDER NO.</span><span class="dots"></span>
+  <span>141/TINE/0001</span></div>
+<div class="rrow"><span class="lab">FROM</span><span class="dots"></span>
+  <span>Officer Commanding, Assault Section “Ironclad”</span></div>
+<h2 class="sec">I. &nbsp;STORES REQUIRED</h2>
+<table class="spec">
+  <thead><tr><th>Article</th><th>Required</th><th>Shop</th></tr></thead>
+  <tbody>
+    <tr><td>Niska Mk.&nbsp;I Gun Motor Carriage</td><td>1</td><td>Garage</td></tr>
+    <tr><td>Booker Storm Rifle Model 838</td><td>5</td><td>Factory</td></tr>
+  </tbody>
+</table>
+</body>
+</html>
