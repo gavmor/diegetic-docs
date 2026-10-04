@@ -12,7 +12,7 @@ production Gantt and power-plan chart — all figures traced to the source text.
 
 ```bash
 cd examples/minimal-order
-../../bin/make_plate.py --out assets/paper-plate.png
+../../bin/make_plate.py --pages 2 --out assets/paper-plate.png
 ../../bin/fetch_fonts.py --out assets/fonts
 ../../bin/check.py --html order.html
 python3 -m weasyprint order.html order.pdf
@@ -21,18 +21,15 @@ python3 -m weasyprint order.html order.pdf
 ## Layout
 
 - `SKILL.md` — the operational skill (purpose, workflow, tooling, rules).
-- `bin/` — `make_plate.py` (aged-paper plate), `fetch_fonts.py`
-  (fetch + verify fonts), `check.py` (executable gate),
+- `bin/` — `make_plate.py` (aged-paper plates with randomized coffee rings,
+  crescents, drips, smudges, angled fold creases, multi-page `--pages N`),
+  `fetch_fonts.py` (fetch + verify fonts), `check.py` (executable gate),
   `war_telemetry.py` (live Foxhole war telemetry for stamped orders).
 - `assets/fonts/` — vendored OFL fonts (Courier Prime, Special Elite).
 - `references/` — `print-css.md` (WeasyPrint form patterns + the hard-won
-  `@page` background rules), `charts.md` (JSON-driven Gantt / step-chart
-  renderers + schemas), `war-telemetry.md` (WarAPI endpoints, field mapping,
-  rate limits).
-- `assets/fonts/` — vendored OFL fonts (Courier Prime, Special Elite).
-- `references/` — `print-css.md` (WeasyPrint form patterns + the hard-won
-  `@page` background rules), `charts.md` (PIL chart toolkit + recipes).
-- `examples/minimal-order/` — minimal end-to-end order; render it to try
+  `@page` background rules), `charts.md` (PIL chart toolkit + recipes),
+  `war-telemetry.md` (WarAPI endpoints, field mapping, rate limits).
+- `examples/minimal-order/` — minimal end-to-end 2-page order; render it to try
   the pipeline.
 
 ## The hard-won rules

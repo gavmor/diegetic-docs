@@ -4,3 +4,4 @@ __pycache__/
 examples/*/assets/paper-plate*.png
 examples/*/*.pdf
 examples/*/ex-*.png
+artifacts/

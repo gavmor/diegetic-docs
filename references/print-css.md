@@ -7,10 +7,10 @@ italic runs (overlaps, eaten spaces, phantom gaps).
 
 ## @page background — the hard rules
 
-- **One background-image layer only** on `@page` (also `:left`/`:right`).
+- **One background-image layer only** on `@page` (also `:left`/`:right`/`:nth()`).
   Multiple comma-separated layers are silently dropped; only
   `background-color` paints. Bake the whole plate — paper, stains, vignette,
-  crease — into **one PNG** with `bin/make_plate.py`.
+  crease — into **one PNG per page** with `bin/make_plate.py`.
 - **@page backgrounds position from the page *area* origin, not the page
   box.** With non-zero margins a full-page image shifts right/down by the
   margin. Compensate with negative `background-position`:
@@ -19,18 +19,31 @@ italic runs (overlaps, eaten spaces, phantom gaps).
 @page {
   size: 8.5in 11in;
   margin: 0.72in 0.8in 0.75in 0.8in;
-  background-image: url("assets/paper-plate.png");
+  background-image: url("assets/paper-plate-1.png");
   background-size: 8.5in 11in;
   background-position: -0.8in -0.72in;  /* = -left-margin -top-margin */
   background-repeat: no-repeat;
   @bottom-left   { content: "FORM LQ-7"; font-size: 7.5pt;
                    letter-spacing: 2pt; color: #5a5245; }
-  @bottom-center { content: "— " counter(page) " —"; font-size: 8pt;
+  @bottom-center { content: "— " counter(page) " of " counter(pages) " —"; font-size: 8pt;
                    color: #5a5245; }
   @bottom-right  { content: "SPEAKING WOODS COMMAND"; font-size: 7.5pt;
                    letter-spacing: 2pt; color: #5a5245; }
 }
+
+/* Multi-page documents: randomize background plates per page */
+@page:nth(1) { background-image: url("assets/paper-plate-1.png"); }
+@page:nth(2) { background-image: url("assets/paper-plate-2.png"); }
+@page:nth(3) { background-image: url("assets/paper-plate-3.png"); }
 ```
+
+Generate diverse plates with:
+```bash
+bin/make_plate.py --pages 3 --out assets/paper-plate.png
+```
+This derives deterministic per-page seeds, varying coffee ring locations,
+rotations, crescents, drips, smudges, and fold crease angles so consecutive
+sheets don't duplicate marks.
 
 Margin-box footers (`@bottom-left/center/right`) need an explicit
 `font-family` — they do not inherit the body's.
@@ -56,8 +69,8 @@ absolutely positioned right:
 **Routing block** — label, dotted leader, value, on flex rows:
 
 ```css
-.rrow { display: flex; align-items: baseline; }
-.rrow .dots { flex: 1; border-bottom: 2px dotted #6b6252; margin: 0 6px; }
+.rrow { display: flex; align-items: center; }
+.rrow .dots { flex: 1; border-bottom: 2px dotted #6b6252; margin: 0 6px; height: 1px; }
 ```
 
 **Rubber stamp** — rotated, double border, translucent red; absolute inside

@@ -14,9 +14,11 @@ chart.
 
 ## Workflow
 
-1. **Plate** — `bin/make_plate.py --format portrait|landscape --dpi 200`
-   bakes one PNG carrying the whole page background (tone, grain, stains,
-   vignette, crease). WeasyPrint drops every `@page` background layer but
+1. **Plate** — `bin/make_plate.py --format portrait|landscape --dpi 200 [--pages N]`
+   bakes PNGs carrying the whole page background (tone, grain, stains,
+   vignette, crease). Supports randomized coffee rings, crescents, drips,
+   smudges, angled fold creases, and deterministic per-page seeds for
+   multi-page documents. WeasyPrint drops every `@page` background layer but
    one, so there is no other route.
 2. **Fonts** — `bin/fetch_fonts.py --out assets/fonts` downloads Courier
    Prime (body) + Special Elite (display) and **verifies** each file is real
@@ -46,7 +48,9 @@ A runnable minimal example is in `examples/minimal-order/`.
 
 ## Tooling
 
-- `bin/make_plate.py` — aged-paper plate, portrait/landscape, seeded.
+- `bin/make_plate.py` — aged-paper plates, portrait/landscape, seeded,
+  multi-page (`--pages N`) with randomized coffee stains, crescents, drips,
+  smudges, and fold creases.
 - `bin/fetch_fonts.py` — fetch + verify Courier Prime / Special Elite.
 - `bin/check.py` — executable gate: font validity, `@page` background
   layering, asset references.

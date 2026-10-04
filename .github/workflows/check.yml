@@ -1,7 +1,7 @@
-# Run the skill's executable gate plus an end-to-end example render on every push.
-# Mirrors the push-to-main CI pattern from gavmor/resume (WeasyPrint toolchain).
+# Run the skill's executable gate plus end-to-end example renders on every push.
+# Uploads review PNG and PDF artifacts on every green commit.
 name: check
-on: [push]
+on: [push, pull_request]
 jobs:
   example:
     runs-on: ubuntu-latest
@@ -15,20 +15,35 @@ jobs:
           sudo apt-get update
           sudo apt-get install --no-install-recommends -y \
             libpango-1.0-0 \
-            libpangoft2-1.0-0
+            libpangoft2-1.0-0 \
+            poppler-utils
           python -m pip install --upgrade pip
           python -m pip install weasyprint fonttools pillow
       - name: Gate + example render
         run: |
+          mkdir -p artifacts
           cd examples/minimal-order
-          ../../bin/make_plate.py --out assets/paper-plate.png
+          ../../bin/make_plate.py --pages 2 --out assets/paper-plate.png
           ../../bin/fetch_fonts.py --out assets/fonts
           ../../bin/check.py --html order.html
           python3 -m weasyprint order.html order.pdf
+          pdftoppm -png -r 150 order.pdf ../../artifacts/order-page
+          cp order.pdf ../../artifacts/
       - name: Chart examples
         run: |
           cd examples/charts
           ../../bin/gantt.py --spec production-timetable.json \
-            --out /tmp/production-timetable.png
+            --out ../../artifacts/production-timetable.png
+          ../../bin/gantt.py --spec production-timetable.json \
+            --out ../../artifacts/production-timetable.pdf
           ../../bin/stepchart.py --spec power-plan.json \
-            --out /tmp/power-plan.png
+            --out ../../artifacts/power-plan.png
+          ../../bin/stepchart.py --spec power-plan.json \
+            --out ../../artifacts/power-plan.pdf
+      - name: Upload review artifacts
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: review-artifacts
+          path: artifacts/
+          if-no-files-found: error

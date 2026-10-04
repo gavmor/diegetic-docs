@@ -14,13 +14,16 @@
 @page {
   size: 8.5in 11in;
   margin: 0.8in;
-  background-image: url("assets/paper-plate.png");
+  background-image: url("assets/paper-plate-1.png");
   background-size: 8.5in 11in;
   background-position: -0.8in -0.8in;
   background-repeat: no-repeat;
-  @bottom-center { content: "— " counter(page) " —";
+  @bottom-center { content: "— " counter(page) " of " counter(pages) " —";
     font-family: "Courier Prime", monospace; font-size: 8pt; color: #5a5245; }
 }
+@page:nth(1) { background-image: url("assets/paper-plate-1.png"); }
+@page:nth(2) { background-image: url("assets/paper-plate-2.png"); }
+
 body { font-family: "Courier Prime", monospace; font-size: 10.5pt;
        line-height: 1.42; color: #26221a; margin: 0; }
 .masthead { position: relative; border-top: 5px double #26221a;
@@ -31,20 +34,29 @@ body { font-family: "Courier Prime", monospace; font-size: 10.5pt;
 .stamp { position: absolute; right: 6px; top: -30px; transform: rotate(-9deg);
   border: 4px double #9c1f1f; color: #9c1f1f; font-weight: 700;
   font-size: 18pt; letter-spacing: 6px; padding: 2px 12px; opacity: 0.78; }
-.rrow { display: flex; align-items: baseline; margin: 3px 0; }
+.stamp-approved { position: absolute; right: 8px; top: -24px; transform: rotate(7deg);
+  border: 4px double #1f6b34; color: #1f6b34; font-weight: 700;
+  font-size: 16pt; letter-spacing: 5px; padding: 2px 10px; opacity: 0.82; }
+.rrow { display: flex; align-items: center; margin: 3px 0; }
 .rrow .lab { font-weight: 700; font-size: 9.5pt; white-space: nowrap; }
-.rrow .dots { flex: 1; border-bottom: 2px dotted #6b6252; margin: 0 6px; }
+.rrow .dots { flex: 1; border-bottom: 2px dotted #6b6252; margin: 0 6px; height: 1px; }
 h2.sec { font-size: 11.5pt; letter-spacing: 3px;
-  border-bottom: 2px solid #26221a; padding-bottom: 3px; }
+  border-bottom: 2px solid #26221a; padding-bottom: 3px; margin-top: 18px; }
 table.spec { width: 100%; border-collapse: collapse; font-size: 9.6pt;
   page-break-inside: avoid; }
 table.spec th { text-align: left; border-bottom: 3px double #26221a;
   padding: 4px 6px; }
 table.spec td { border-bottom: 1px solid #8a8069; padding: 4px 6px; }
 table.spec tr:last-child td { border-bottom: 2px solid #26221a; }
+.pagebreak { page-break-after: always; break-after: page; }
+.signblock { margin-top: 28px; }
+.notebox { border: 1.5px solid #26221a; padding: 8px 12px;
+  background: rgba(255, 252, 244, 0.35); page-break-inside: avoid; margin-top: 14px; }
 </style>
 </head>
 <body>
+
+<!-- PAGE 1 -->
 <div class="masthead">
   <div class="stamp">DRAFT</div>
   <h1>TINE LOGISTICS DEPOT</h1>
@@ -54,13 +66,55 @@ table.spec tr:last-child td { border-bottom: 2px solid #26221a; }
   <span>141/TINE/0001</span></div>
 <div class="rrow"><span class="lab">FROM</span><span class="dots"></span>
   <span>Officer Commanding, Assault Section “Ironclad”</span></div>
+<div class="rrow"><span class="lab">DATE</span><span class="dots"></span>
+  <span>Day 27, 141st War</span></div>
+
 <h2 class="sec">I. &nbsp;STORES REQUIRED</h2>
 <table class="spec">
   <thead><tr><th>Article</th><th>Required</th><th>Shop</th></tr></thead>
   <tbody>
     <tr><td>Niska Mk.&nbsp;I Gun Motor Carriage</td><td>1</td><td>Garage</td></tr>
     <tr><td>Booker Storm Rifle Model 838</td><td>5</td><td>Factory</td></tr>
+    <tr><td>7.92mm Standard Ammunition (crates)</td><td>12</td><td>Munitions Plant</td></tr>
+    <tr><td>Heavy Explosive Charge (Alligator)</td><td>8</td><td>Munitions Plant</td></tr>
   </tbody>
 </table>
+
+<div class="notebox">
+  <strong>NOTE:</strong> Priority dispatch to Westgate sector rail siding.
+  Armor plating to undergo field proof test prior to movement order issuance.
+</div>
+
+<div class="pagebreak"></div>
+
+<!-- PAGE 2 -->
+<div class="masthead" style="padding: 8px 12px; margin-bottom: 12px;">
+  <div class="stamp-approved">PASSED</div>
+  <h1 style="font-size: 14pt;">TINE LOGISTICS DEPOT &mdash; ORDER 141/TINE/0001</h1>
+  <div class="sub" style="font-size: 8.5pt;">SECTION II: DISPATCH ROUTING &amp; FIELD RECEIPT</div>
+</div>
+
+<h2 class="sec">II. &nbsp;ROUTING &amp; STAGING ALLOCATION</h2>
+<table class="spec">
+  <thead><tr><th>Article</th><th>Depot Bay</th><th>Transport Medium</th><th>Clearance</th></tr></thead>
+  <tbody>
+    <tr><td>Niska Mk.&nbsp;I GMC</td><td>Bay 04 (Heavy Yard)</td><td>Flatbed Rail Wagon</td><td>Approved</td></tr>
+    <tr><td>Booker Storm Rifles (5)</td><td>Crate Rack C-12</td><td>Dunne Transport 2.5t</td><td>Approved</td></tr>
+    <tr><td>7.92mm Ammunition (12 cr)</td><td>Magazine Bunker 2</td><td>Dunne Transport 2.5t</td><td>Approved</td></tr>
+    <tr><td>Alligator Charges (8)</td><td>Explosives Lockup A</td><td>Escorted Convoy</td><td>Restricted</td></tr>
+  </tbody>
+</table>
+
+<h2 class="sec">III. &nbsp;INSPECTION &amp; CLEARANCE SIGN-OFF</h2>
+<div class="signblock">
+  <div class="rrow"><span class="lab">STORES INSPECTOR</span><span class="dots"></span>
+    <span>Sgt. M. Vane, Tine Depot Yard</span></div>
+  <div class="rrow"><span class="lab">CLEARANCE SIGNATURE</span><span class="dots"></span>
+    <span>M. Vane (authenticated)</span></div>
+  <div class="rrow" style="margin-top: 10px;"><span class="lab">RECEIVING OFFICER</span><span class="dots"></span>
+    <span>Capt. H. Sterling, Assault Sec. Ironclad</span></div>
+  <div class="rrow"><span class="lab">TRANSFER RECEIPT</span><span class="dots"></span>
+    <span>STORES DRAWN IN FULL &amp; SERVICED</span></div>
+</div>
 </body>
 </html>
