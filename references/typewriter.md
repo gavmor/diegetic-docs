@@ -35,9 +35,13 @@ bold nor implements `text-shadow`, so there is no CSS-only bold. That is
 period-accurate: a typewriter had no bold key. Emphasis was ALL CAPS,
 underlining — or **overstrike**: hitting the same key twice, the carriage
 unmoved. `bin/typewriter.py --overstrike` does exactly this for
-`<strong>`/`<b>`: every glyph is emitted twice, the second copy overlaid
+`<strong>`/`<b>` **and any element with a `data-os` attribute** (use it
+for headings, table headers, and labels that were `font-weight: 700`):
+every glyph is emitted twice, the second copy overlaid
 at `margin-left: -1ch` with a micro-rotation and reduced opacity. The
-result reads as bold with a tell-tale double-hit roughness.
+result reads as bold with a tell-tale double-hit roughness. Map the
+family's 700 weight to the same regular file in `@font-face` so weight
+requests stay in-family; the visible bold comes from the injector.
 
 ## The injector: bin/typewriter.py
 
@@ -85,6 +89,13 @@ Rules that keep it honest:
   sub-point; `pdftotext` won't show them.
 - `pdftotext` **will** fragment badly on typed documents (every wrapped
   character is a span boundary). Expected; search PDFs tolerantly.
+- **Never use negative `text-indent` on typed paragraphs.** WeasyPrint
+  mislays `inline-block` imperfection spans on a negatively-indented
+  first line (smeared, overlapping glyphs — verified 2026-10-04). For
+  hanging-indent lists, put the marker in `::before` with a negative
+  `margin-left` instead:
+  `ul.instr li { padding-left: 18px; }`
+  `ul.instr li::before { content: "— "; margin-left: -18px; }`
 - Watch wrapped characters at line ends in QA anyway: the `nowrap` word
   guard keeps breaks between words, but verify visually (`pdftoppm -png
   -r 90`) — the defects are sub-point and `pdftotext` won't show them.

@@ -12,11 +12,13 @@ majority keeps line-breaking and OpenType contextual alternates intact,
 while the sprinkled defects read as mechanical wear. Same --seed gives
 byte-identical output; spans are marked data-tw so re-runs are safe.
 
-With --overstrike, text inside <strong>/<b> is double-struck: each glyph
-is emitted twice, the second copy overlaid at a micro-rotation and
-reduced opacity — exactly how a typist faked bold by hitting the key
-twice. (TT2020 ships no bold weight, and WeasyPrint neither synthesizes
-faux bold nor implements text-shadow, so overstrike is the honest route.)
+With --overstrike, text inside <strong>/<b> (or any element carrying a
+`data-os` attribute, for headings/table headers/labels that were
+font-weight:700) is double-struck: each glyph is emitted twice, the
+second copy overlaid at a micro-rotation and reduced opacity — exactly
+how a typist faked bold by hitting the key twice. (TT2020 ships no bold
+weight, and WeasyPrint neither synthesizes faux bold nor implements
+text-shadow, so overstrike is the honest route.)
 
 Usage:
     typewriter.py [--seed 7] [--rate 0.18] [--overstrike] in.html -o out.html
@@ -68,13 +70,13 @@ class Typer(HTMLParser):
         self.out = []
         self.skip_depth = 0
         self.tw_depth = 0
-        self.strong_depth = 0
+        self.os_stack = []  # tags currently inside an overstrike context
 
     def handle_starttag(self, tag, attrs):
         if tag in SKIP:
             self.skip_depth += 1
-        if tag in ("strong", "b"):
-            self.strong_depth += 1
+        if tag in ("strong", "b") or any(k == "data-os" for k, _ in attrs):
+            self.os_stack.append(tag)
         if any(k == "data-tw" for k, _ in attrs):
             self.tw_depth += 1
         self.out.append(self.get_starttag_text())
@@ -82,8 +84,8 @@ class Typer(HTMLParser):
     def handle_endtag(self, tag):
         if tag in SKIP and self.skip_depth:
             self.skip_depth -= 1
-        if tag in ("strong", "b") and self.strong_depth:
-            self.strong_depth -= 1
+        if self.os_stack and self.os_stack[-1] == tag:
+            self.os_stack.pop()
         if tag == "span" and self.tw_depth:
             self.tw_depth -= 1
         self.out.append(f"</{tag}>")
@@ -93,7 +95,7 @@ class Typer(HTMLParser):
 
     def _emit(self, ch):
         """One character, with optional overstrike second hit."""
-        if (self.overstrike and self.strong_depth and ch.strip()
+        if (self.overstrike and self.os_stack and ch.strip()
                 and not self.tw_depth):
             rot = round(self.rng.uniform(0.2, 0.6)
                         * self.rng.choice((-1, 1)), 2)
@@ -156,8 +158,8 @@ def main():
     p.add_argument("--rate", type=float, default=0.18,
                    help="fraction of characters to imperfect (0-1)")
     p.add_argument("--overstrike", action="store_true",
-                   help="double-strike <strong>/<b> text like a real "
-                        "typewriter faking bold")
+                   help="double-strike <strong>/<b> and [data-os] text like "
+                        "a real typewriter faking bold")
     a = p.parse_args()
     if not 0 <= a.rate <= 1:
         p.error("--rate must be between 0 and 1")
