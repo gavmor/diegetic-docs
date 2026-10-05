@@ -1,0 +1,141 @@
+/* =====================================================================
+ * Foxhole — print pattern library (WeasyPrint)
+ *
+ * Canonical home: gavmor/foxhole-styles. Both the diegetic-docs skill
+ * and the Homebrewery V3 Foxhole theme derive from these tokens.
+ *
+ * WeasyPrint hard rules (from long, painful bisection):
+ *  - ONE background-image layer only on @page (also :left/:right/:nth()).
+ *    Multiple comma-separated layers are silently dropped; only
+ *    background-color paints. Bake paper + stains + vignette + crease
+ *    into one PNG per page with plate/make_plate.py.
+ *  - @page backgrounds position from the page *area* origin, not the
+ *    page box. With non-zero margins a full-page image shifts right/down
+ *    by the margin. Compensate with negative background-position
+ *    (= -left-margin -top-margin) alongside background-size = page size.
+ *  - Margin-box footers (@bottom-left/center/right) need an explicit
+ *    font-family — they do not inherit the body's.
+ *  - WeasyPrint will not synthesize weights/styles: @font-face every
+ *    weight/style you use; unregistered italics silently fall back.
+ *  - pdftotext fragments text at italic/style boundaries — never trust
+ *    it alone for spacing QA. Rasterize and look (pdftoppm -png -r 60).
+ * ===================================================================== */
+
+/* ---- Type ---- */
+@font-face { font-family: "TT2020"; src: url("../fonts/tt2020-styleb-regular.ttf");
+             font-weight: normal; font-style: normal; }
+@font-face { font-family: "TT2020"; src: url("../fonts/tt2020-styleb-italic.ttf");
+             font-weight: normal; font-style: italic; }
+@font-face { font-family: "Special Elite"; src: url("../fonts/special-elite-regular.ttf");
+             font-weight: normal; font-style: normal; }
+
+body {
+  font-family: "TT2020", monospace;
+  font-size: 10.5pt;
+  line-height: 1.42;
+  color: var(--fx-ink);
+}
+
+/* ---- Page ---- */
+@page {
+  size: 8.5in 11in;
+  margin: 0.72in 0.8in 0.75in 0.8in;
+  background-image: url("assets/paper-plate-1.png");
+  background-size: 8.5in 11in;
+  background-position: -0.8in -0.72in;   /* = -left-margin -top-margin */
+  background-repeat: no-repeat;
+  @bottom-left   { content: "FORM LQ-7"; font-family: "TT2020", monospace;
+                   font-size: 7.5pt; letter-spacing: 2pt; color: var(--fx-muted); }
+  @bottom-center { content: "— " counter(page) " of " counter(pages) " —";
+                   font-family: "TT2020", monospace; font-size: 8pt;
+                   color: var(--fx-muted); }
+  @bottom-right  { content: "SPEAKING WOODS COMMAND"; font-family: "TT2020", monospace;
+                   font-size: 7.5pt; letter-spacing: 2pt; color: var(--fx-muted); }
+}
+
+/* Multi-page documents: randomize plates so consecutive sheets differ.
+   Bake with: make_plate.py --pages 3 --out assets/paper-plate.png */
+@page:nth(1) { background-image: url("assets/paper-plate-1.png"); }
+@page:nth(2) { background-image: url("assets/paper-plate-2.png"); }
+@page:nth(3) { background-image: url("assets/paper-plate-3.png"); }
+
+/* ---- Masthead: double-rule box, stamp absolutely positioned right ---- */
+.masthead {
+  position: relative;
+  border-top: 5px double var(--fx-ink);
+  border-bottom: 5px double var(--fx-ink);
+  padding: 14px 10px 12px 118px;
+}
+.masthead h1 {
+  font-family: "Special Elite", "TT2020", monospace;
+  font-size: 22pt;
+  letter-spacing: 2pt;
+  margin: 0;
+}
+
+/* ---- Routing block: label, dotted leader, value, on flex rows ---- */
+.rrow { display: flex; align-items: center; }
+.rrow .dots { flex: 1; border-bottom: 2px dotted var(--fx-dots);
+              margin: 0 6px; height: 1px; }
+
+/* ---- Rubber stamp: rotated, double border, translucent red.
+ * Absolute inside a relatively-positioned masthead so it overlaps
+ * the border like a real stamp. WeasyPrint supports transform: rotate()
+ * on block elements. ---- */
+.stamp {
+  position: absolute; right: -2px; top: -38px;
+  transform: rotate(-9deg);
+  border: 4px double var(--fx-stamp);
+  color: var(--fx-stamp);
+  font-weight: 700; font-size: 21pt;
+  letter-spacing: 7px;
+  padding: 4px 14px 2px 20px;
+  opacity: 0.78;
+}
+
+/* ---- Spec tables: double rule under header, single rules between
+ * rows, double rule closing the body ---- */
+table.spec {
+  width: 100%; border-collapse: collapse; font-size: 9.6pt;
+  page-break-inside: avoid;
+}
+table.spec thead th { border-bottom: 3px double var(--fx-ink); }
+table.spec tbody td { border-bottom: 1px solid var(--fx-rule); }
+table.spec tbody tr:last-child td { border-bottom: 2px solid var(--fx-ink); }
+
+/* ---- Section heads: letterspaced, ruled ---- */
+h2.sec {
+  font-size: 11.5pt; font-weight: 700; letter-spacing: 3px;
+  border-bottom: 2px solid var(--fx-ink); padding-bottom: 3px;
+}
+
+/* ---- Note boxes: thin rule, slight paper-light fill ---- */
+.notebox {
+  border: 1.5px solid var(--fx-ink);
+  padding: 8px 12px;
+  background: rgba(255, 252, 244, 0.35);
+  page-break-inside: avoid;
+}
+
+/* ---- Correction patch: notes stuck on after typing. Dirty-white
+ * tape / correction-fluid patch, slightly rotated, whisper of shadow.
+ * No border; the lift sells it. Keep the shadow faint — paper on paper,
+ * not a UI card. ---- */
+.notebox-tape {
+  position: relative;
+  margin: 14px 10px;
+  padding: 10px 16px 9px;
+  background: linear-gradient(175deg, #f7f3e7 0%, #f0ead7 55%, #e8e1cb 100%);
+  transform: rotate(-0.7deg);
+  box-shadow: 1px 1px 2px rgba(74, 62, 38, 0.18);
+  page-break-inside: avoid;
+  font-size: 9.6pt;
+}
+
+/* ---- Vintage typewriter emulation ----
+ * TT2020 has no bold; WeasyPrint has no faux bold or text-shadow.
+ * Emulate overstrike (double-strike) in markup instead:
+ * <span class="os">heading text</span> renders each glyph twice with a
+ * sub-pixel offset. The diegetic-docs skill's bin/typewriter.py does this
+ * automatically for <strong>/<b>/[data-os] at build time. */
+.os { /* marker class only; glyph doubling is applied by typewriter.py */ }

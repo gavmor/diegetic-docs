@@ -5,6 +5,11 @@ use takumi-pdf for styled prose: it has unfixable paragraph-level state
 corruption where a styled inline earlier in a paragraph mispositions later
 italic runs (overlaps, eaten spaces, phantom gaps).
 
+The canonical pattern library is **`references/foxhole-print.css`**,
+vendored from gavmor/foxhole-styles (`bin/sync-styles.sh`). The sections
+below document the WeasyPrint engine rules and usage; the CSS itself lives
+in that file — do not fork it here.
+
 ## @page background — the hard rules
 
 - **One background-image layer only** on `@page` (also `:left`/`:right`/`:nth()`).

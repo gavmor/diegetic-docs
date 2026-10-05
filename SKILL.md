@@ -12,6 +12,16 @@ spec tables, and PIL-drawn planning charts. Proven on an 11-page Warden
 requisition order (Form LQ-7, rev. 2) plus a production Gantt and power-plan
 chart.
 
+## Styles — shared dependency
+
+The Foxhole look (fonts, plate baker, print CSS patterns, Homebrewery
+theme) is canonically owned by **gavmor/foxhole-styles** and vendored
+here by `bin/sync-styles.sh` (fonts → `fonts/`, plate baker →
+`bin/make_plate.py`, print patterns → `references/foxhole-print.css`).
+The vendored copies are committed so the skill works standalone; re-run
+the sync after any visual change upstream. Do not edit the vendored
+files here — change them in foxhole-styles and re-sync.
+
 ## Workflow
 
 1. **Plate** — `bin/make_plate.py --format portrait|landscape --dpi 200 [--pages N]`
