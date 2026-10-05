@@ -111,6 +111,26 @@ h2.sec { font-size: 11.5pt; font-weight: 700; letter-spacing: 3px;
            page-break-inside: avoid; }
 ```
 
+**Correction patch** — for notes that should read as stuck on after
+typing: a dirty-white tape / correction-fluid patch, slightly rotated,
+whisper of shadow. No border; the lift sells it:
+
+```css
+.notebox-tape {
+  position: relative;
+  margin: 14px 10px;
+  padding: 10px 16px 9px;
+  background: linear-gradient(175deg, #f7f3e7 0%, #f0ead7 55%, #e8e1cb 100%);
+  transform: rotate(-0.7deg);
+  box-shadow: 1px 1px 2px rgba(74, 62, 38, 0.18);
+  page-break-inside: avoid;
+  font-size: 9.6pt;
+}
+```
+
+Keep the shadow faint — it should read as paper on paper, not a UI
+card. Proven on the Tümmler annex (141/TINE/0004).
+
 ## QA
 
 - `pdftotext` fragments text at italic/style boundaries — never trust it
