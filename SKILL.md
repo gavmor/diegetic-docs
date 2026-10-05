@@ -21,9 +21,10 @@ chart.
    multi-page documents. WeasyPrint drops every `@page` background layer but
    one, so there is no other route.
 2. **Fonts** — `bin/fetch_fonts.py --out assets/fonts` downloads Courier
-   Prime (body) + Special Elite (display) and **verifies** each file is real
-   font data. A 404 HTML page saved as `.ttf` renders as a silent fallback;
-   the script deletes those and fails.
+   Prime (body) + Special Elite (display) + TT2020 Style B (vintage body:
+   scanned glyphs with contextual alternates) and **verifies** each file
+   is real font data. A 404 HTML page saved as `.ttf` renders as a silent
+   fallback; the script deletes those and fails.
 3. **Document** — write the HTML per `references/print-css.md` (masthead,
    routing block with dotted leaders, spec tables, note boxes, stamp,
    margin-box footers). Transcribe the source faithfully; form furniture
@@ -43,6 +44,13 @@ chart.
    `python3 -m weasyprint doc.html doc.pdf`. **Rasterize and look**
    (`pdftoppm -png -r 60`); never trust `pdftotext` alone at style
    boundaries. For Discord, export PNGs at 150–200dpi.
+6. **Vintage type (optional)** — for the full manual-typewriter look,
+   set the body in TT2020 (`references/typewriter.md`) and run
+   `bin/typewriter.py --seed 7 --rate 0.18 --overstrike doc.html -o
+   doc-typed.html` before rendering: seeded per-letter baseline shifts,
+   tracking jitter, rotation, opacity, plus double-strike overstrike for
+   `<strong>` (TT2020 has no bold; a real typewriter faked it the same
+   way). Deterministic; QA the raster for mid-word breaks.
 
 A runnable minimal example is in `examples/minimal-order/`.
 
@@ -51,7 +59,8 @@ A runnable minimal example is in `examples/minimal-order/`.
 - `bin/make_plate.py` — aged-paper plates, portrait/landscape, seeded,
   multi-page (`--pages N`) with randomized coffee stains, crescents, drips,
   smudges, and fold creases.
-- `bin/fetch_fonts.py` — fetch + verify Courier Prime / Special Elite.
+- `bin/fetch_fonts.py` — fetch + verify Courier Prime / Special Elite /
+  TT2020 Style B (OFL license vendored alongside).
 - `bin/check.py` — executable gate: font validity, `@page` background
   layering, asset references.
 - `bin/war_telemetry.py` — live Foxhole war telemetry for stamped orders
